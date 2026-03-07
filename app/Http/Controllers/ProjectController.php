@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class ProjectController extends Controller
 {
@@ -12,7 +14,9 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        //
+        // Only fetches projects belonging to the currently logged-in user
+        $projects = Auth::user()->projects()->latest()->get();
+        return view('projects.index', compact('projects'));
     }
 
     /**
@@ -20,7 +24,7 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        //
+        return view('projects.create');
     }
 
     /**
@@ -28,23 +32,34 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        Auth::user()->projects()->create($validated);
+
+        return redirect()->route('projects.index')->with('success', 'Project created successfully.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Project $project)
-    {
-        //
-    }
+    // public function show(Project $project)
+    // {
+    //     //
+    // }
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(Project $project)
     {
-        //
+        // Security check: ensure the project belongs to the logged-in user
+        if ($project->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        return view('projects.edit', compact('project'));
     }
 
     /**
@@ -52,7 +67,17 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        //
+        if ($project->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $project->update($validated);
+
+        return redirect()->route('projects.index')->with('success', 'Project updated successfully.');
     }
 
     /**
@@ -60,6 +85,12 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        //
+        if ($project->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $project->delete();
+
+        return redirect()->route('projects.index')->with('success', 'Project deleted successfully.');
     }
 }
