@@ -15,7 +15,7 @@ class ProjectController extends Controller
     public function index()
     {
         // Only fetches projects belonging to the currently logged-in user
-        $projects = Auth::user()->projects()->latest()->get();
+        $projects = Auth::user()->projects()->with('tasks')->latest()->get();
         return view('projects.index', compact('projects'));
     }
 
