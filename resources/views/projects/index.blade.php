@@ -29,6 +29,7 @@
                                 <td class="border-b py-2">{{ $project->name }}</td>
                                 <td class="border-b py-2">{{ $project->created_at->format('M d, Y') }}</td>
                                 <td class="border-b py-2 text-right">
+                                    <a href="{{ route('projects.tasks.index', $project) }}" class="text-green-600 hover:text-green-900 mr-2 font-bold">Manage Tasks</a>
                                     <a href="{{ route('projects.edit', $project) }}" class="text-indigo-600 hover:text-indigo-900 mr-2">Edit</a>
                                     <form action="{{ route('projects.destroy', $project) }}" method="POST" class="inline">
                                         @csrf
