@@ -10,6 +10,7 @@ class Task extends Model
     use HasFactory;
 
     protected $fillable = ['project_id', 'title', 'description', 'status', 'due_date'];
+    protected $touches = ['project'];
 
     public function project()
     {
